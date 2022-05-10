@@ -27,7 +27,7 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "did-jwt": "^5.12.3",
+    "@eengineer1/did-jwt": "^6.0.0-cheqd",
     "did-resolver": "^3.1.5"
   },
   "repository": {
