@@ -8,7 +8,7 @@ import {
   verifyPresentation,
   verifyPresentationPayloadOptions,
 } from '../index'
-import { decodeJWT, ES256KSigner } from 'did-jwt'
+import { decodeJWT, ES256KSigner } from '@eengineer1/did-jwt'
 import { Resolvable } from 'did-resolver'
 import {
   CreatePresentationOptions,

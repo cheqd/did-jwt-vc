@@ -13,7 +13,7 @@ import {
   PresentationPayload,
   W3CPresentation,
 } from './types'
-import { decodeJWT } from 'did-jwt'
+import { decodeJWT } from '@eengineer1/did-jwt'
 
 /*
  * Additional W3C VC fields:
