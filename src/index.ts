@@ -186,8 +186,6 @@ export function validateEqualPayloads(
     typeof payload?.issuer === 'object' &&
     payloadJWT.iss !== payload.issuer.id
   ) {
-    console.warn(payloadJWT)
-    console.warn(payload)
     return { valid: false, message: `invalid_issuer: The 'issuer' fields of type 'string' do not match.` }
   }
   //credentialSubject
@@ -197,8 +195,6 @@ export function validateEqualPayloads(
       message: `invalid_credentialSubject: The 'credentialSubject' fields of type 'string' do not match.`,
     }
   //issuanceDate
-  console.warn(payloadJWT)
-  console.warn(payload)
   if (
     (payloadJWT?.nbf &&
       typeof payload?.issuanceDate === 'string' &&
@@ -207,8 +203,6 @@ export function validateEqualPayloads(
       payload?.issuanceDate instanceof Date &&
       payloadJWT?.nbf !== payload?.issuanceDate.valueOf() / 1000)
   ) {
-    console.warn(payloadJWT)
-    console.warn(payload)
     return {
       valid: false,
       message: `invalid_issuanceDate: The 'issuanceDate' fields of type '${typeof payload?.issuanceDate}' do not match.`,
@@ -295,6 +289,7 @@ export async function verifyCredential(
       nonJWTPayload
     )
     if (!equalPayloads.valid) {
+      // Additional verbose
       console.warn(equalPayloads.message)
       throw new Error(`Invalid Credential Payload or the Credential has been tampered with.`)
     }
