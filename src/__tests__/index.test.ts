@@ -8,7 +8,7 @@ import {
   verifyPresentation,
   verifyPresentationPayloadOptions,
 } from '../index'
-import { decodeJWT, ES256KSigner } from '@eengineer1/did-jwt'
+import { decodeJWT, ES256KSigner } from 'did-jwt'
 import { Resolvable } from 'did-resolver'
 import {
   CreatePresentationOptions,
@@ -55,7 +55,7 @@ const ethrDidIssuer = new EthrDID({
   privateKey: 'd8b595680851765f38ea5405129244ba3cbad84467d190859f4c8b20c1ff6c75',
 }) as Issuer
 
-const verifiableCredentialPayload = {
+const verifiableCredentialJWTPayload = {
   sub: DID_B,
   nbf: 1562950282,
   vc: {
@@ -69,6 +69,39 @@ const verifiableCredentialPayload = {
     },
   },
 }
+
+const verifiableCredentialPayload = {
+  '@context': [DEFAULT_CONTEXT, EXTRA_CONTEXT_A],
+  issuer: {
+    id: 'did:ethr:' + '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+  },
+  type: [DEFAULT_VC_TYPE, EXTRA_TYPE_A],
+  credentialSubject: {
+    id: DID_B,
+    degree: {
+      type: 'BachelorDegree',
+      name: 'Baccalauréat en musiques numériques',
+    },
+  },
+  issuanceDate: new Date(verifiableCredentialJWTPayload.nbf * 1000).toISOString(),
+}
+
+const falseVerifiableCredentialPayload = {
+  '@context': [DEFAULT_CONTEXT, EXTRA_CONTEXT_A],
+  issuer: {
+    id: 'did:ethr:' + '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+  },
+  type: [DEFAULT_VC_TYPE, EXTRA_TYPE_A],
+  credentialSubject: {
+    id: DID_B,
+    degree: {
+      type: 'BachelorDegree',
+      name: 'Baccalauréat en musiques numériques',
+    },
+  },
+  issuanceDate: new Date(1652815847 * 1000).toISOString(), //altered issuanceDate
+}
+
 const presentationPayload = {
   vp: {
     '@context': [DEFAULT_CONTEXT, EXTRA_CONTEXT_A],
@@ -104,14 +137,14 @@ describe('createVerifiableCredential', () => {
   const issuer = ethrDidIssuer
   it('creates a valid Verifiable Credential JWT with required fields', async () => {
     expect.assertions(1)
-    const vcJwt = await createVerifiableCredentialJwt(verifiableCredentialPayload, issuer)
+    const vcJwt = await createVerifiableCredentialJwt(verifiableCredentialJWTPayload, issuer)
     const decodedVc = await decodeJWT(vcJwt)
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
   })
   it('creates a valid Verifiable Credential JWT with extra optional fields', async () => {
     expect.assertions(1)
-    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, extra: 42 }, issuer)
+    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialJWTPayload, extra: 42 }, issuer)
     const decodedVc = await decodeJWT(vcJwt)
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
@@ -119,13 +152,13 @@ describe('createVerifiableCredential', () => {
   it('creates a Verifiable Credential JWT with custom JWT alg', async () => {
     expect.assertions(1)
     const customIssuer = { ...issuer, alg: 'ES256K-R' }
-    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, extra: 42 }, customIssuer)
+    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialJWTPayload, extra: 42 }, customIssuer)
     const decodedVc = await decodeJWT(vcJwt)
     expect(decodedVc.header).toEqual({ alg: 'ES256K-R', typ: 'JWT' })
   })
   it('creates a Verifiable Credential JWT with custom JWT header fields', async () => {
     expect.assertions(1)
-    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, extra: 42 }, issuer, {
+    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialJWTPayload, extra: 42 }, issuer, {
       header: { alg: 'ES256K-R', custom: 'field' },
     })
     const decodedVc = await decodeJWT(vcJwt)
@@ -135,7 +168,7 @@ describe('createVerifiableCredential', () => {
     expect.assertions(1)
     const nbf = Math.floor(Date.now() / 1000)
     const expiresIn = 86400
-    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, nbf }, issuer, {
+    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialJWTPayload, nbf }, issuer, {
       expiresIn,
       header: { alg: 'ES256K-R' },
     })
@@ -144,16 +177,16 @@ describe('createVerifiableCredential', () => {
   })
   it('calls functions to validate required fields', async () => {
     expect.assertions(4)
-    await createVerifiableCredentialJwt(verifiableCredentialPayload, issuer)
-    expect(mockValidateTimestamp).toHaveBeenCalledWith(verifiableCredentialPayload.nbf)
-    expect(mockValidateContext).toHaveBeenCalledWith(verifiableCredentialPayload.vc['@context'])
-    expect(mockValidateVcType).toHaveBeenCalledWith(verifiableCredentialPayload.vc.type)
-    expect(mockValidateCredentialSubject).toHaveBeenCalledWith(verifiableCredentialPayload.vc.credentialSubject)
+    await createVerifiableCredentialJwt(verifiableCredentialJWTPayload, issuer)
+    expect(mockValidateTimestamp).toHaveBeenCalledWith(verifiableCredentialJWTPayload.nbf)
+    expect(mockValidateContext).toHaveBeenCalledWith(verifiableCredentialJWTPayload.vc['@context'])
+    expect(mockValidateVcType).toHaveBeenCalledWith(verifiableCredentialJWTPayload.vc.type)
+    expect(mockValidateCredentialSubject).toHaveBeenCalledWith(verifiableCredentialJWTPayload.vc.credentialSubject)
   })
   it('calls functions to validate optional fields if they are present', async () => {
     expect.assertions(1)
     const timestamp = Math.floor(new Date().getTime())
-    await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, exp: timestamp }, issuer)
+    await createVerifiableCredentialJwt({ ...verifiableCredentialJWTPayload, exp: timestamp }, issuer)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(timestamp)
   })
 })
@@ -327,6 +360,33 @@ describe('verifyCredential', () => {
     const verified = await verifyCredential(VC_JWT, resolver)
     expect(verified.payload.vc).toBeDefined()
     expect(verified.verifiableCredential).toBeDefined()
+  })
+
+  it('verifies a valid Verifiable Credential and the credential payload body against the JWT payload', async () => {
+    expect.assertions(2)
+    const verified = await verifyCredential(
+      VC_JWT,
+      resolver,
+      { validateNonJWTPayload: true },
+      verifiableCredentialPayload
+    )
+    expect(verified.payload.vc).toBeDefined()
+    expect(verified.verifiableCredential).toBeDefined()
+  })
+
+  it('throws when a credential payload body is not provided when required', async () => {
+    expect.assertions(1)
+    expect(async () => await verifyCredential(VC_JWT, resolver, { validateNonJWTPayload: true })).rejects.toThrow(
+      'Non-JWT Payload is not provided while validation is on.'
+    )
+  })
+
+  it('rejects an invalid credential payload body', async () => {
+    expect.assertions(1)
+    expect(
+      async () =>
+        await verifyCredential(VC_JWT, resolver, { validateNonJWTPayload: true }, falseVerifiableCredentialPayload)
+    ).rejects.toThrow('Invalid Credential Payload or the Credential has been tampered with.')
   })
 
   it('verifies and converts a legacy format attestation into a Verifiable Credential', async () => {

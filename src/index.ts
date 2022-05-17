@@ -1,5 +1,6 @@
 import { createJWT, verifyJWT } from '@eengineer1/did-jwt'
 import { Resolvable } from 'did-resolver'
+import _ from 'lodash'
 import * as validators from './validators'
 import {
   JwtCredentialPayload,
@@ -20,6 +21,7 @@ import {
   CreateCredentialOptions,
   VerifyCredentialOptions,
   JWT_ALG,
+  CredentialPayloadValidationMessage,
 } from './types'
 import {
   transformCredentialInput,
@@ -153,6 +155,88 @@ export function validateCredentialPayload(payload: CredentialPayload): void {
   if (payload.expirationDate) validators.validateTimestamp(payload.expirationDate)
 }
 
+export function validateEqualPayloads(
+  payloadJWT: JwtCredentialPayload,
+  payload: CredentialPayload
+): CredentialPayloadValidationMessage {
+  //@context
+  if (typeof payloadJWT.vc['@context'] === 'string' && payloadJWT.vc['@context'] !== payload['@context'])
+    return { valid: false, message: `invalid_@context: The '@context' fields of type 'string' do not match.` }
+  if (
+    !Array.isArray(payloadJWT.vc['@context']) ||
+    !Array.isArray(payload['@context']) ||
+    !payloadJWT.vc['@context'].every((context: string) => payload['@context'].indexOf(context) !== -1) ||
+    !payload['@context'].every((context: string) => payloadJWT.vc['@context'].indexOf(context) !== -1)
+  )
+    return { valid: false, message: `invalid_@context: The '@context' fields of type 'string[]' do not match.` }
+  //type
+  if (typeof payloadJWT.vc.type === 'string' && payloadJWT.vc.type !== payload.type)
+    return { valid: false, message: `invalid_type: The 'type' fields of type 'string' do not match.` }
+  if (
+    !Array.isArray(payloadJWT.vc.type) ||
+    !Array.isArray(payload.type) ||
+    !payloadJWT.vc.type.every((type: string) => payload.type.indexOf(type) !== -1) ||
+    !payload.type.every((type: string) => payloadJWT.vc.type.indexOf(type) !== -1)
+  )
+    return { valid: false, message: `invalid_type: The 'type' fields of type 'string[]' do not match.` }
+  //issuer
+  if (
+    payloadJWT?.iss &&
+    typeof payloadJWT?.iss === 'string' &&
+    typeof payload?.issuer === 'object' &&
+    payloadJWT.iss !== payload.issuer.id
+  ) {
+    console.warn(payloadJWT)
+    console.warn(payload)
+    return { valid: false, message: `invalid_issuer: The 'issuer' fields of type 'string' do not match.` }
+  }
+  //credentialSubject
+  if (!_.isEqual({ ...payloadJWT.vc.credentialSubject, id: payloadJWT?.sub }, payload.credentialSubject))
+    return {
+      valid: false,
+      message: `invalid_credentialSubject: The 'credentialSubject' fields of type 'string' do not match.`,
+    }
+  //issuanceDate
+  console.warn(payloadJWT)
+  console.warn(payload)
+  if (
+    (payloadJWT?.nbf &&
+      typeof payload?.issuanceDate === 'string' &&
+      payloadJWT?.nbf !== new Date(payload?.issuanceDate).valueOf() / 1000) ||
+    (payloadJWT?.nbf &&
+      payload?.issuanceDate instanceof Date &&
+      payloadJWT?.nbf !== payload?.issuanceDate.valueOf() / 1000)
+  ) {
+    console.warn(payloadJWT)
+    console.warn(payload)
+    return {
+      valid: false,
+      message: `invalid_issuanceDate: The 'issuanceDate' fields of type '${typeof payload?.issuanceDate}' do not match.`,
+    }
+  }
+  //expirationDate
+  if (
+    payloadJWT?.exp &&
+    (typeof payload?.expirationDate === 'string' || typeof payload?.expirationDate === 'number') &&
+    payloadJWT.exp !== new Date(payload?.expirationDate).valueOf() / 1000
+  )
+    return {
+      valid: false,
+      message: `invalid_expirationDate: The 'expirationDate' fields of type 'string' do not match.`,
+    }
+  if (
+    payloadJWT?.exp &&
+    payload?.expirationDate instanceof Date &&
+    payloadJWT.exp !== payload?.expirationDate.valueOf() / 1000
+  )
+    return {
+      valid: false,
+      message: `invalid_expirationDate: The 'expirationDate' fields instance of 'Date' do not match.`,
+    }
+
+  return { valid: true, message: `` }
+}
+
 export function validateJwtPresentationPayload(payload: JwtPresentationPayload): void {
   validators.validateContext(payload.vp['@context'])
   validators.validateVpType(payload.vp.type)
@@ -196,11 +280,25 @@ export function validatePresentationPayload(payload: PresentationPayload): void 
 export async function verifyCredential(
   vc: JWT,
   resolver: Resolvable,
-  options: VerifyCredentialOptions = {}
+  options: VerifyCredentialOptions = {},
+  nonJWTPayload?: CredentialPayload
 ): Promise<VerifiedCredential> {
   const verified: Partial<VerifiedCredential> = await verifyJWT(vc, { resolver, ...options })
   verified.verifiableCredential = normalizeCredential(verified.jwt as string, options?.removeOriginalFields)
   validateCredentialPayload(verified.verifiableCredential)
+  if (options?.validateNonJWTPayload || nonJWTPayload) {
+    if (!nonJWTPayload) throw new Error('Non-JWT Payload is not provided while validation is on.')
+
+    validateCredentialPayload(nonJWTPayload)
+    const equalPayloads = validateEqualPayloads(
+      { ...verified.payload, vc: verified.verifiableCredential },
+      nonJWTPayload
+    )
+    if (!equalPayloads.valid) {
+      console.warn(equalPayloads.message)
+      throw new Error(`Invalid Credential Payload or the Credential has been tampered with.`)
+    }
+  }
   return verified as VerifiedCredential
 }
 

@@ -8,6 +8,11 @@ export const DEFAULT_VC_TYPE = 'VerifiableCredential'
 export const DEFAULT_VP_TYPE = 'VerifiablePresentation'
 export const DEFAULT_JWT_PROOF_TYPE = 'JwtProof2020'
 
+export interface CredentialPayloadValidationMessage {
+  valid: boolean
+  message: string
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type JwtCredentialSubject = Record<string, any>
 

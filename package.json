@@ -1,6 +1,6 @@
 {
   "name": "@eengineer1/did-jwt-vc",
-  "version": "2.1.9-cheqd",
+  "version": "2.1.9-cheqd-dep",
   "description": "Create and verify W3C Verifiable Credentials and Presentations in JWT format",
   "source": "src/index.ts",
   "main": "./lib/index.js",
@@ -27,8 +27,9 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "@eengineer1/did-jwt": "^6.0.0-cheqd",
-    "did-resolver": "^3.1.5"
+    "@eengineer1/did-jwt": "^6.0.1-cheqd",
+    "did-resolver": "^3.1.5",
+    "lodash": "^4.17.21"
   },
   "repository": {
     "type": "git",
@@ -56,6 +57,7 @@
     "@types/elliptic": "6.4.14",
     "@types/faker": "6.6.8",
     "@types/jest": "27.4.0",
+    "@types/lodash": "^4.14.182",
     "@types/node": "16.11.19",
     "@typescript-eslint/eslint-plugin": "5.9.1",
     "@typescript-eslint/parser": "5.9.1",

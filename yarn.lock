@@ -1016,10 +1016,10 @@
   "resolved" "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
   "version" "0.2.3"
 
-"@eengineer1/did-jwt@^6.0.0-cheqd":
-  "integrity" "sha512-Ev5nhLjVSDbQAkeL7oyB/t8IBtDvnpD4dPtfklDEaWhVpByyUOh5cwD7tBg6fgzPZCUYsHL0lxa479TQ3CtLbg=="
-  "resolved" "https://registry.npmjs.org/@eengineer1/did-jwt/-/did-jwt-6.0.0-cheqd.tgz"
-  "version" "6.0.0-cheqd"
+"@eengineer1/did-jwt@^6.0.1-cheqd":
+  "integrity" "sha512-UnHjt5AB9iRwqsfwvypKt8p9/MIMbiJCnt+lrDOVduAH/APvbRNDWf1iZNvDJwy84BRyDRGyG9reKN90z2WPLA=="
+  "resolved" "https://registry.npmjs.org/@eengineer1/did-jwt/-/did-jwt-6.0.1-cheqd.tgz"
+  "version" "6.0.1-cheqd"
   dependencies:
     "@stablelib/ed25519" "^1.0.2"
     "@stablelib/random" "^1.0.1"
@@ -2287,6 +2287,11 @@
   "integrity" "sha512-qcUXuemtEu+E5wZSJHNxUXeCZhAfXKQ41D+duX+VYPde7xyEVZci+/oXKJL13tnRs9lR2pr4fod59GT6/X1/yQ=="
   "resolved" "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.9.tgz"
   "version" "7.0.9"
+
+"@types/lodash@^4.14.182":
+  "integrity" "sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q=="
+  "resolved" "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.182.tgz"
+  "version" "4.14.182"
 
 "@types/minimist@^1.2.0":
   "integrity" "sha1-aaI6OtKcrwCX8G7aWbNh7i8GOfY="
