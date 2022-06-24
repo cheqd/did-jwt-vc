@@ -1,4 +1,4 @@
-import { createJWT, verifyJWT } from '@eengineer1/did-jwt'
+import { createJWT, verifyJWT } from 'did-jwt'
 import { Resolvable } from 'did-resolver'
 import * as validators from './validators'
 import {
