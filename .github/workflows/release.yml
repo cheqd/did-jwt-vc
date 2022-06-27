@@ -33,5 +33,5 @@ jobs:
           NPM_TOKEN: ${{secrets.NPM_GITHUB_PAT}}
         if: github.ref == 'refs/heads/cheqd'
         run: |
-          yarn config set '//npm.pkg.github.com/:_authToken' "${secrets.NPM_GITHUB_PAT}"
+          yarn config set '//npm.pkg.github.com/:_authToken' "${{secrets.NPM_GITHUB_PAT}}"
           yarn run release
