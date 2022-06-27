@@ -1,3 +1,13 @@
+## [2.1.10](https://github.com/cheqd/did-jwt-vc/compare/2.1.9...2.1.10) (2022-06-27)
+
+
+### Bug Fixes
+
+* **ci:** groom the build scripts and dependencies ([#114](https://github.com/cheqd/did-jwt-vc/issues/114)) ([381d973](https://github.com/cheqd/did-jwt-vc/commit/381d9731d043672da992c4ce704cd8b0f16c2a2c))
+* **deps:** bump did-jwt to v6 ([#108](https://github.com/cheqd/did-jwt-vc/issues/108)) ([ad0e3f9](https://github.com/cheqd/did-jwt-vc/commit/ad0e3f906822f2d11d1c9ef7c66fd436cbee9ab6))
+* **deps:** bump did-jwt to v6.1.0 ([#112](https://github.com/cheqd/did-jwt-vc/issues/112)) ([540b8d5](https://github.com/cheqd/did-jwt-vc/commit/540b8d505c9aebdab405f5931009658b34cca189))
+* **upstream:** General pre-publish fixes & sync with upstream project ([4b19d72](https://github.com/cheqd/did-jwt-vc/commit/4b19d72e8bc14748994f4d56310330b1aedd7b86))
+
 ## [2.1.12](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.11...2.1.12) (2022-06-06)
 
 
