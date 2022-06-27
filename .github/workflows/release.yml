@@ -24,12 +24,14 @@ jobs:
 
       - name: "Setup git coordinates"
         run: |
-          git config user.name uport-automation-bot
-          git config user.email devops@uport.me
+          git config user.name cheqd-automation-bot
+          git config user.email tasos@cheqd.io
 
       - name: "Run semantic-release"
         env:
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
           NPM_TOKEN: ${{secrets.NPM_GITHUB_PAT}}
         if: github.ref == 'refs/heads/cheqd'
-        run: yarn run release
+        run: |
+          yarn config set '//npm.pkg.github.com/:_authToken' "${secrets.NPM_GITHUB_PAT}"
+          yarn run release
