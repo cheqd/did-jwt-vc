@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'master'
+      - 'cheqd'
 jobs:
   build-test-publish:
     runs-on: ubuntu-18.04
@@ -31,5 +31,5 @@ jobs:
         env:
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
           NPM_TOKEN: ${{secrets.NPM_GITHUB_PAT}}
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/cheqd'
         run: yarn run release
