@@ -19,7 +19,3 @@ jobs:
       - run: yarn run lint
       - run: yarn run test:ci
 
-      - name: "Upload coverage reports"
-        uses: codecov/codecov-action@v3
-        with:
-          fail_ci_if_error: true
